@@ -3,7 +3,7 @@ import logging
 import os
 from flask import Flask
 
-from common import config, db, ma, cors, sio, scheduler, api
+from common import config, db, ma, cors, sio, scheduler, api, guard
 from const import APP_NAME, DEFAULT_CONFIG_PATH
 
 def create_app(config_path: str) -> Flask:
@@ -16,19 +16,22 @@ def create_app(config_path: str) -> Flask:
     logging.info(f"Port: {config.config_model.networking.port}")
 
     config.init_app(app)
+    cors.init_app(app)
     db.init_app(app)
     ma.init_app(app)
     api.init_app(app)
-    cors.init_app(app)
     sio.init_app(app, cors_allowed_origins="*") # TODO fix CORS policy
     scheduler.init_app(app)
-    
+
     import events
     import models
+    from models import BaseModel, User
     import views
 
+    guard.init_app(app, User)
+    
     with app.app_context():
-        models.BaseModel.set_session(db.session)
+        BaseModel.set_session(db.session)
 
         if config.config_model.sqlite.recreate:
             logging.info("Recreating database...")
@@ -37,6 +40,15 @@ def create_app(config_path: str) -> Flask:
 
         db.create_all()
         db.session.commit()
+        
+        admin_user: User = User.where(roles="admin").first()
+
+        if not admin_user:
+            admin_user = User.create(
+                name=config.config_model.auth.admin_username,
+                password=config.config_model.auth.admin_password,
+                roles="admin"
+            )
 
     return app
 
