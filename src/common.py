@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_socketio import SocketIO
 from flask_apscheduler import APScheduler
+from flask_smorest import Api
 
 from config import Config
 
@@ -18,3 +19,4 @@ db: SQLAlchemy = SQLAlchemy(session_options={
 ma: Marshmallow = Marshmallow()
 sio: SocketIO = SocketIO()
 scheduler: APScheduler = APScheduler()
+api: Api = Api()

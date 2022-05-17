@@ -8,7 +8,7 @@ from marshmallow import ValidationError
 from marshmallow_dataclass import class_schema
 from yaml import safe_dump, safe_load
 
-from const import DEFAULT_CONFIG_PATH, DEFAULT_HOST, DEFAULT_LOG_LEVEL, DEFAULT_LOG_PATH, DEFAULT_PORT, DEFAULT_SECRET_KEY, DEFAULT_SQLITE_PATH
+from const import APP_NAME, APP_VERSION, DEFAULT_CONFIG_PATH, DEFAULT_HOST, DEFAULT_LOG_LEVEL, DEFAULT_LOG_PATH, DEFAULT_OPENAPI_JSON_PATH, DEFAULT_PORT, DEFAULT_SECRET_KEY, DEFAULT_SQLITE_PATH, SWAGGER_UI_URL
 
 
 @dataclass
@@ -92,6 +92,13 @@ class Config:
         app.config["SQLALCHEMY_COMMIT_ON_TEARDOWN"] = True
         app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
         app.config["SQLALCHEMY_ECHO"] = self.config_model.sqlite.echo
+        app.config["API_TITLE"] = APP_NAME
+        app.config["API_VERSION"] = APP_VERSION
+        app.config["OPENAPI_VERSION"] = "3.0.0"
+        app.config["OPENAPI_URL_PREFIX"] = "/"
+        app.config["OPENAPI_JSON_PATH"] = "openapi.json"
+        app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui/"
+        app.config["OPENAPI_SWAGGER_UI_URL"] = SWAGGER_UI_URL
 
     def create_folders(self):
         db_folder: str = os.path.dirname(os.path.abspath(self.config_model.sqlite.path))
