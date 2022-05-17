@@ -25,11 +25,16 @@ class User(BaseModel):
 Similarily You can automatically generate views for you models by using the `add_view()` decorator.
 This will generate default REST endpoints to perform CRUD operations for the model.
 
+### Authentication and Authorization
+
+Protect your views and endpoints by using the decorator `auth.auth_required` and `auth.roles_required(*roles)`. 
+
 ### Third party extensions
 
 It also features the following extensions:
 
 * flask-smorest
+* flask-praetorian
 * SQLAlchemy
 * SQLAlchemy-Mixins
 * Marshmallow
@@ -72,7 +77,6 @@ SocketIO events should be implemented in `src/events`.
 ## Planned Features
 
 * Add template tests
-* Add Authentication and Authorization using flask-praetorian
 * Add Github workflows
 * Implement Dockerfile
 * Add SonarQube scanning
