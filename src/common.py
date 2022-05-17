@@ -4,6 +4,7 @@ from flask_marshmallow import Marshmallow
 from flask_socketio import SocketIO
 from flask_apscheduler import APScheduler
 from flask_smorest import Api
+from flask_praetorian import Praetorian
 
 from config import Config
 
@@ -20,3 +21,4 @@ ma: Marshmallow = Marshmallow()
 sio: SocketIO = SocketIO()
 scheduler: APScheduler = APScheduler()
 api: Api = Api()
+guard: Praetorian = Praetorian()

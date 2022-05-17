@@ -5,11 +5,15 @@ from sqlalchemy_mixins.activerecord import ModelNotFoundError
 
 from models import BaseModel
 from common import api
+from auth import auth_required, roles_required
 
 
 def add_view(**kwargs):
     
     def decorator(cls):
+
+        auth: dict = kwargs.pop("auth", {})
+        decorators: dict = kwargs.pop("decorators", {})
         single_model_name: str = cls.__name__
         plural_model_name: str = f"{single_model_name}s"
         lower_single_model_name: str = cls.__name__.lower()
@@ -24,10 +28,8 @@ def add_view(**kwargs):
             )
         )
 
-
-        @blueprint.route("/<int:entity_id>")
         class SingleView(MethodView):
-
+            
             @blueprint.response(200, cls.Schema())
             def get(self, entity_id: int):
                 try:
@@ -59,7 +61,6 @@ def add_view(**kwargs):
                         message=f"{single_model_name} with id {entity_id} does not exist."
                     )
 
-        @blueprint.route("/")
         class PluralView(MethodView):
 
             @blueprint.response(200, cls.Schema(many=True))
@@ -74,12 +75,32 @@ def add_view(**kwargs):
                 entity.save()
                 todo_dict: dict = cls.dump(entity)
                 return jsonify(todo_dict), 201
+        
+        for operation_type, decorator_list in decorators.items():
+            method = getattr(SingleView if operation_type.value[0] == "SingleView" else PluralView, operation_type.value[1])
 
-        single_name = f"{single_model_name}View"
-        plural_name = f"{plural_model_name}View"
+            for decorator in decorator_list:
+                setattr(SingleView if operation_type.value[0] == "SingleView" else PluralView, operation_type.value[1], decorator(method))
 
-        setattr(cls, single_name, SingleView)
-        setattr(cls, plural_name, PluralView)
+        for operation_type, auth_dict in auth.items():
+            view = SingleView if operation_type.value[0] == "SingleView" else PluralView
+            method_name = operation_type.value[1]
+
+            method = getattr(view, method_name)
+
+            is_auth_required: bool = auth_dict.get("auth_required", False)
+            roles: list[str] = auth_dict.get("roles", [])
+
+            if is_auth_required:
+                method = auth_required(method)
+                setattr(view, method_name, method)
+
+            if roles:
+                method = roles_required(*roles)(method)
+                setattr(view, method_name, method)
+
+        SingleView = blueprint.route("/<int:entity_id>")(SingleView)
+        PluralView = blueprint.route("/")(PluralView)
 
         api.register_blueprint(blueprint)
 

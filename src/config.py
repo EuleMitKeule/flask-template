@@ -8,7 +8,7 @@ from marshmallow import ValidationError
 from marshmallow_dataclass import class_schema
 from yaml import safe_dump, safe_load
 
-from const import APP_NAME, APP_VERSION, DEFAULT_CONFIG_PATH, DEFAULT_DATE_FORMAT, DEFAULT_HOST, DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_LOG_PATH, DEFAULT_PORT, DEFAULT_SECRET_KEY, DEFAULT_SQLITE_PATH, SWAGGER_UI_URL
+from const import APP_NAME, APP_VERSION, DEFAULT_CONFIG_PATH, DEFAULT_DATE_FORMAT, DEFAULT_HOST, DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_LOG_PATH, DEFAULT_PORT, DEFAULT_SECRET_KEY, DEFAULT_SQLITE_PATH, REDOC_URL, SWAGGER_UI_URL
 
 
 @dataclass
@@ -30,11 +30,17 @@ class ConfigModel:
         recreate: bool = field(default=False, metadata=dict(required=False))
         echo: bool = field(default=False, metadata=dict(required=False))
 
+    @dataclass
+    class AuthConfig:
+        admin_username: str = field(default="admin", metadata=dict(required=False))
+        admin_password: str = field(default="admin", metadata=dict(required=False))
+
     secret_key: str = field(default=DEFAULT_SECRET_KEY, metadata=dict(required=False))
     debug: bool = field(default=False, metadata=dict(required=False))
     networking: NetworkingConfig = field(default=NetworkingConfig(), metadata=dict(required=False))
     sqlite: SqliteConfig = field(default=SqliteConfig(), metadata=dict(required=False))
     logging: LoggingConfig = field(default=LoggingConfig(), metadata=dict(required=False))
+    auth: AuthConfig = field(default=AuthConfig(), metadata=dict(required=False))
 
 
 class Config:
@@ -99,6 +105,20 @@ class Config:
         app.config["OPENAPI_JSON_PATH"] = "openapi.json"
         app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui/"
         app.config["OPENAPI_SWAGGER_UI_URL"] = SWAGGER_UI_URL
+        app.config["OPENAPI_REDOC_PATH"] = "/redoc/"
+        app.config["OPENAPI_REDOC_URL"] = REDOC_URL
+        app.config["API_SPEC_OPTIONS"] = {
+            "components": {
+                "securitySchemes": {
+                    "bearerAuth": {
+                        "type": "http",
+                        "scheme": "bearer",
+                        "bearerFormat": "JWT",
+                        "in": "header"
+                    }
+                }
+            },
+        }
 
     def create_folders(self):
         db_folder: str = os.path.dirname(os.path.abspath(self.config_model.sqlite.path))
