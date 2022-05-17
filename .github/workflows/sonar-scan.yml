@@ -33,7 +33,6 @@ jobs:
 
       - name: run tests
         run: |
-          mkdir data
           cd src
           python -m pytest --rootdir . --cov=. --cov-config=../config/.coveragerc --cov-report=xml:../coverage/coverage.xml
 
