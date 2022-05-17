@@ -73,6 +73,8 @@ class Config:
                 logging.error(e)
                 exit(1)
 
+        self.create_folders()
+
         logging.basicConfig(
             level=DEFAULT_LOG_LEVEL,
             format=DEFAULT_LOG_FORMAT,
@@ -82,8 +84,6 @@ class Config:
                 logging.StreamHandler(),
             ]
         )
-
-        self.create_folders()
 
     def init_app(self, app: Flask) -> None:
         logging.info(f"Using logging file at {self.config_model.logging.path}.")
