@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": 
+    [
+        {
+            "label": "Run server",
+            "type": "shell",
+            "isBackground": true,
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
+            "runOptions": { 
+                "runOn": "folderOpen" 
+            },
+
+            "windows": {
+                "command": "powershell.exe",
+                "args": [
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    "${workspaceFolder}/.vscode/run-server.ps1"
+                ],
+            },
+
+            "linux": {
+                "command": "zsh",
+                "args": [
+                    "${workspaceFolder}/.vscode/run-server.sh"
+                ],
+            },
+        }
+    ]
+}

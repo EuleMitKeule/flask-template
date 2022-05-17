@@ -1,0 +1,20 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/venv/Scripts/python.exe",
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.debugPort": 3007,
+    "python.testing.cwd": "${workspaceFolder}/src",
+    "python.testing.pytestArgs": [
+        "--cov=${workspaceFolder}/src",
+        "--cov-report=xml:../coverage/coverage.xml",
+        "--cov-config=../config/.coveragerc",
+        "--config=../config/test.config.yml",
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.pytest_cache": true,
+        "**/.coverage": true,
+        "**/__pycache__": true,
+        "**/venv": true,
+    },
+}

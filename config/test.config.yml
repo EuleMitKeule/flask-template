@@ -1,0 +1,12 @@
+debug: true
+logging:
+  level: INFO
+  path: ../logs/test.app.log
+networking:
+  host: localhost
+  port: 5000
+secret_key: changeme
+sqlite:
+  echo: false
+  path: ../data/test.app.sqlite
+  recreate: false
