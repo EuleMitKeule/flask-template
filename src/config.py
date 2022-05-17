@@ -8,7 +8,7 @@ from marshmallow import ValidationError
 from marshmallow_dataclass import class_schema
 from yaml import safe_dump, safe_load
 
-from const import APP_NAME, APP_VERSION, DEFAULT_CONFIG_PATH, DEFAULT_HOST, DEFAULT_LOG_LEVEL, DEFAULT_LOG_PATH, DEFAULT_OPENAPI_JSON_PATH, DEFAULT_PORT, DEFAULT_SECRET_KEY, DEFAULT_SQLITE_PATH, SWAGGER_UI_URL
+from const import APP_NAME, APP_VERSION, DEFAULT_CONFIG_PATH, DEFAULT_DATE_FORMAT, DEFAULT_HOST, DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_LOG_PATH, DEFAULT_PORT, DEFAULT_SECRET_KEY, DEFAULT_SQLITE_PATH, SWAGGER_UI_URL
 
 
 @dataclass
@@ -58,16 +58,6 @@ class Config:
 
             try:
                 self.config_model = config_schema.load(config_dict)
-
-                logging.basicConfig(
-                    level=DEFAULT_LOG_LEVEL,
-                    format="%(asctime)s %(levelname)s: %(message)s",
-                    datefmt="%Y-%m-%d %H:%M:%S",
-                    handlers=[
-                        logging.FileHandler(self.config_model.logging.path),
-                        logging.StreamHandler(),
-                    ]
-                )
             except ValidationError as e:
                 logging.error(f"Config file is invalid.")
                 logging.error(e)
@@ -76,6 +66,16 @@ class Config:
                 logging.error(f"Failed to load config.")
                 logging.error(e)
                 exit(1)
+
+        logging.basicConfig(
+            level=DEFAULT_LOG_LEVEL,
+            format=DEFAULT_LOG_FORMAT,
+            datefmt=DEFAULT_DATE_FORMAT,
+            handlers=[
+                logging.FileHandler(self.config_model.logging.path),
+                logging.StreamHandler(),
+            ]
+        )
 
         self.create_folders()
 
