@@ -1,0 +1,48 @@
+name: sonar-scan
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+  workflow_dispatch:
+
+jobs:
+  sonar-scan:
+    name: sonar-scan
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: checkout
+        uses: actions/checkout@v3
+        with: 
+          fetch-depth: 0
+      
+      - name: install python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      
+      - name: install requirements
+        run: |
+          pip install -r requirements.txt
+
+      - name: run tests
+        run: |
+          mkdir data
+          cd src
+          python -m pytest --rootdir . --cov=. --cov-config=../config/.coveragerc --cov-report=xml:../coverage/coverage.xml
+
+      - name: fix code coverage paths
+        run: |
+          sed -i 's/\/home\/runner\/work\/flask-template\/flask-template\//\/github\/workspace\//g' coverage/coverage.xml
+
+      - name: scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

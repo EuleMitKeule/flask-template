@@ -31,3 +31,4 @@ docs/_build/
 **/*.log
 **/*.yml
 !**/test.config.yml
+!.github/**/*.yml
