@@ -5,6 +5,7 @@ from flask_socketio import SocketIO
 from flask_apscheduler import APScheduler
 from flask_smorest import Api
 from flask_praetorian import Praetorian
+from flask_wtf import CSRFProtect
 
 from src.config import Config
 
@@ -22,3 +23,4 @@ sio: SocketIO = SocketIO()
 scheduler: APScheduler = APScheduler()
 api: Api = Api()
 guard: Praetorian = Praetorian()
+csrf: CSRFProtect = CSRFProtect()
