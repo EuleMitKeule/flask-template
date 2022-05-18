@@ -1,4 +1,6 @@
 import logging
+from logging.config import dictConfig
+from logging.handlers import RotatingFileHandler
 import os
 from dataclasses import dataclass, field
 from flask import Flask
@@ -31,6 +33,8 @@ class ConfigModel:
     @dataclass
     class LoggingConfig:
         level: str = field(default=DEFAULT_LOG_LEVEL, metadata=dict(required=False))
+        format: str = field(default=DEFAULT_LOG_FORMAT, metadata=dict(required=False))
+        date_format: str = field(default=DEFAULT_DATE_FORMAT, metadata=dict(required=False))
         path: str = field(default=DEFAULT_LOG_PATH, metadata=dict(required=False))
 
     @dataclass
@@ -62,17 +66,14 @@ class Config:
     config_model: ConfigModel
     app: Flask
 
+    def __init__(self):
+        self.config_model = None
+        self.app = None
+
     def load(self, config_path: str) -> None:
+        self.configure_logging()
 
-        logging.basicConfig(
-            level=DEFAULT_LOG_LEVEL,
-            format=DEFAULT_LOG_FORMAT,
-            datefmt=DEFAULT_DATE_FORMAT,
-            handlers=[
-                logging.StreamHandler(),
-            ]
-        )
-
+        logging.info(f"Starting {APP_NAME}...")
         logging.info(f"Loading config from {os.path.abspath(config_path)}.")
 
         if not os.path.exists(config_path):
@@ -96,16 +97,7 @@ class Config:
                 exit(1)
 
         self.create_folders()
-
-        logging.basicConfig(
-            level=DEFAULT_LOG_LEVEL,
-            format=DEFAULT_LOG_FORMAT,
-            datefmt=DEFAULT_DATE_FORMAT,
-            handlers=[
-                logging.FileHandler(self.config_model.logging.path),
-                logging.StreamHandler(),
-            ]
-        )
+        self.configure_logging()
 
     def init_app(self, app: Flask) -> None:
         logging.info(f"Using logging file at {os.path.abspath(self.config_model.logging.path)}.")
@@ -142,6 +134,8 @@ class Config:
             },
         }
 
+        app.logger.setLevel(self.config_model.logging.level)
+
     def create_folders(self):
         db_folder: str = os.path.dirname(os.path.abspath(self.config_model.sqlite.path))
         log_folder: str = os.path.dirname(os.path.abspath(self.config_model.logging.path))
@@ -173,3 +167,57 @@ class Config:
             logging.error(f"Failed to create default config.")
             logging.error(e)
             exit(1)
+
+    def configure_logging(self):
+
+        handlers: dict = {
+            "wsgi": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://flask.logging.wsgi_errors_stream",
+                "formatter": "default"
+            },
+        }
+
+        root: dict = {
+            "level": DEFAULT_LOG_LEVEL,
+            "handlers": ["wsgi"],
+        }
+
+        werkzeug: dict = {
+            "level": DEFAULT_LOG_LEVEL,
+            "handlers": [],
+        }
+
+        formatters: dict = {
+            "default": {
+                "format": DEFAULT_LOG_FORMAT,
+                "datefmt": DEFAULT_DATE_FORMAT
+            }
+        }
+
+        if self.config_model:
+            handlers["file"] = {
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": self.config_model.logging.path,
+                "maxBytes": 10485760,
+                "backupCount": 5,
+                "formatter": "default",
+                "encoding": "utf8"
+            }
+            root["level"] = self.config_model.logging.level
+            root["handlers"].append("file")
+            werkzeug["level"] = self.config_model.logging.level
+            formatters["default"]["format"] = self.config_model.logging.format
+            formatters["default"]["datefmt"] = self.config_model.logging.date_format
+            
+        dictConfig(
+            {
+                "version": 1,
+                "formatters": formatters,
+                "handlers": handlers,
+                "loggers": {
+                    "root": root,
+                    "werkzeug": werkzeug
+                }
+            }
+        )

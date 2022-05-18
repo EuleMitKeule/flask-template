@@ -8,13 +8,9 @@ from src.const import APP_NAME, DEFAULT_CONFIG_PATH
 
 config_path: str = os.environ.get("CONFIG_PATH", DEFAULT_CONFIG_PATH)
 
-app = Flask(__name__)
-
 config.load(config_path)
 
-app.logger.info(f"Starting {APP_NAME}...")
-app.logger.info(f"Host: {config.config_model.networking.host}")
-app.logger.info(f"Port: {config.config_model.networking.port}")
+app = Flask(__name__)
 
 config.init_app(app)
 cors.init_app(app)
