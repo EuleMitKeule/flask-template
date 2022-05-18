@@ -8,7 +8,21 @@ from marshmallow import ValidationError
 from marshmallow_dataclass import class_schema
 from yaml import safe_dump, safe_load
 
-from const import APP_NAME, APP_VERSION, DEFAULT_CONFIG_PATH, DEFAULT_DATE_FORMAT, DEFAULT_HOST, DEFAULT_LOG_FORMAT, DEFAULT_LOG_LEVEL, DEFAULT_LOG_PATH, DEFAULT_PORT, DEFAULT_SECRET_KEY, DEFAULT_SQLITE_PATH, REDOC_URL, SWAGGER_UI_URL
+from src.const import (
+    APP_NAME,
+    APP_VERSION,
+    DEFAULT_CONFIG_PATH,
+    DEFAULT_DATE_FORMAT, 
+    DEFAULT_HOST, 
+    DEFAULT_LOG_FORMAT, 
+    DEFAULT_LOG_LEVEL, 
+    DEFAULT_LOG_PATH, 
+    DEFAULT_PORT, 
+    DEFAULT_SECRET_KEY, 
+    DEFAULT_SQLITE_PATH, 
+    REDOC_URL, 
+    SWAGGER_UI_URL
+)
 
 
 @dataclass
@@ -50,6 +64,17 @@ class Config:
 
     def load(self, config_path: str) -> None:
 
+        logging.basicConfig(
+            level=DEFAULT_LOG_LEVEL,
+            format=DEFAULT_LOG_FORMAT,
+            datefmt=DEFAULT_DATE_FORMAT,
+            handlers=[
+                logging.StreamHandler(),
+            ]
+        )
+
+        logging.info(f"Loading config from {os.path.abspath(config_path)}.")
+
         if not os.path.exists(config_path):
             logging.warn(f"Config file does not exist at path {config_path}. Using default config.")
             self.create_default()
@@ -83,14 +108,14 @@ class Config:
         )
 
     def init_app(self, app: Flask) -> None:
-        logging.info(f"Using logging file at {self.config_model.logging.path}.")
-        logging.info(f"Connecting to database file at {self.config_model.sqlite.path}.")
+        logging.info(f"Using logging file at {os.path.abspath(self.config_model.logging.path)}.")
+        logging.info(f"Using database file at {os.path.abspath(self.config_model.sqlite.path)}.")
 
         self.app = app
 
         app.config["DEBUG"] = self.config_model.debug
         app.config["SECRET_KEY"] = self.config_model.secret_key
-        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{self.config_model.sqlite.path}"
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.abspath(self.config_model.sqlite.path)}"
         app.config["SCHEDULER_API_ENABLED"] = True
         app.config["SQLALCHEMY_COMMIT_ON_TEARDOWN"] = True
         app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

@@ -1,1 +1,1 @@
-import views.auth_view
+import src.views.auth_view

@@ -1,4 +1,4 @@
-from common import db, ma
+from src.common import db, ma
 
 
 def add_schema(**kwargs):

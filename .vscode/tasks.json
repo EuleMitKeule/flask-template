@@ -20,14 +20,14 @@
                     "-ExecutionPolicy",
                     "Bypass",
                     "-File",
-                    "${workspaceFolder}/.vscode/run-server.ps1"
+                    "${workspaceFolder}/scripts/run-server.ps1"
                 ],
             },
 
             "linux": {
                 "command": "zsh",
                 "args": [
-                    "${workspaceFolder}/.vscode/run-server.sh"
+                    "${workspaceFolder}/scripts/run-server.sh"
                 ],
             },
         }

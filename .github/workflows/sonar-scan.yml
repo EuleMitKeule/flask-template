@@ -33,8 +33,7 @@ jobs:
 
       - name: run tests
         run: |
-          cd src
-          python -m pytest --rootdir . --cov=. --cov-config=../config/.coveragerc --cov-report=xml:../coverage/coverage.xml
+          python -m pytest --cov=src --cov-config=config/.coveragerc --cov-report=xml:coverage/coverage.xml
 
       - name: fix code coverage paths
         run: |

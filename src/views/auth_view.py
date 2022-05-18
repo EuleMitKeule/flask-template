@@ -2,8 +2,8 @@ from flask import jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint
 
-from models import User
-from common import ma, guard, api
+from src.models import User
+from src.common import ma, guard, api
 
 
 class LoginQuerySchema(ma.Schema):
