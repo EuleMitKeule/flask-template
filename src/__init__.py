@@ -3,7 +3,7 @@ import logging
 import os
 from flask import Flask
 
-from src.common import config, db, ma, cors, sio, scheduler, api, guard
+from src.common import config, db, ma, cors, sio, scheduler, api, guard, csrf
 from src.const import APP_NAME, DEFAULT_CONFIG_PATH
 
 config_path: str = os.environ.get("CONFIG_PATH", DEFAULT_CONFIG_PATH)
@@ -23,6 +23,7 @@ ma.init_app(app)
 api.init_app(app)
 sio.init_app(app)
 scheduler.init_app(app)
+csrf.init_app(app)
 
 import src.models
 import src.views
