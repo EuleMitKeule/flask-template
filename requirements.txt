@@ -21,3 +21,4 @@ pytest-cov~=3.0.0
 PyYAML~=6.0
 simple-websocket~=0.5.2
 python-dotenv~=0.20.0
+uWSGI~=2.0.20
