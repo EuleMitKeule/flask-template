@@ -1,142 +1,120 @@
 {
-    "paths": {
-        "/todos/{entity_id}": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Todo"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "$ref": "#/components/responses/DEFAULT_ERROR"
-                    }
-                },
-                "tags": [
-                    "todos"
-                ]
-            },
-            "put": {
-                "responses": {
-                    "422": {
-                        "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-                    },
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Todo"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "$ref": "#/components/responses/DEFAULT_ERROR"
-                    }
-                },
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Todo"
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "todos"
-                ]
-            },
-            "delete": {
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "$ref": "#/components/responses/DEFAULT_ERROR"
-                    }
-                },
-                "tags": [
-                    "todos"
-                ]
-            },
-            "parameters": [
-                {
-                    "in": "path",
-                    "name": "entity_id",
-                    "required": true,
-                    "schema": {
-                        "type": "integer",
-                        "minimum": 0
-                    }
-                }
-            ]
-        },
-        "/todos/": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Todo"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "$ref": "#/components/responses/DEFAULT_ERROR"
-                    }
-                },
-                "tags": [
-                    "todos"
-                ]
-            },
-            "post": {
-                "responses": {
-                    "422": {
-                        "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
-                    },
-                    "201": {
-                        "description": "Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Todo"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "$ref": "#/components/responses/DEFAULT_ERROR"
-                    }
-                },
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Todo"
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "todos"
-                ]
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "in": "header"
             }
         },
+        "schemas": {
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Error code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Error message"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Error name"
+                    },
+                    "errors": {
+                        "type": "object",
+                        "description": "Errors"
+                    }
+                }
+            },
+            "PaginationMetadata": {
+                "type": "object",
+                "properties": {
+                    "total": {
+                        "type": "integer"
+                    },
+                    "total_pages": {
+                        "type": "integer"
+                    },
+                    "first_page": {
+                        "type": "integer"
+                    },
+                    "last_page": {
+                        "type": "integer"
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "previous_page": {
+                        "type": "integer"
+                    },
+                    "next_page": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "roles": {
+                        "type": "string",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "access_token": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            }
+        },
+        "responses": {
+            "DEFAULT_ERROR": {
+                "description": "Default error response",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "UNPROCESSABLE_ENTITY": {
+                "description": "Unprocessable Entity",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
         "/users/{entity_id}": {
             "get": {
                 "responses": {
@@ -156,6 +134,11 @@
                 },
                 "tags": [
                     "users"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
                 ]
             },
             "put": {
@@ -273,6 +256,49 @@
                     "users"
                 ]
             }
+        },
+        "/auth/login": {
+            "post": {
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "username",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "422": {
+                        "$ref": "#/components/responses/UNPROCESSABLE_ENTITY"
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/DEFAULT_ERROR"
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            }
         }
     },
     "info": {
@@ -281,120 +307,13 @@
     },
     "tags": [
         {
-            "name": "todos",
+            "name": "users",
             "description": ""
         },
         {
-            "name": "users",
+            "name": "auth",
             "description": ""
         }
     ],
-    "openapi": "3.0.0",
-    "components": {
-        "schemas": {
-            "Error": {
-                "type": "object",
-                "properties": {
-                    "status": {
-                        "type": "string",
-                        "description": "Error name"
-                    },
-                    "errors": {
-                        "type": "object",
-                        "description": "Errors"
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Error message"
-                    },
-                    "code": {
-                        "type": "integer",
-                        "description": "Error code"
-                    }
-                }
-            },
-            "PaginationMetadata": {
-                "type": "object",
-                "properties": {
-                    "total": {
-                        "type": "integer"
-                    },
-                    "total_pages": {
-                        "type": "integer"
-                    },
-                    "first_page": {
-                        "type": "integer"
-                    },
-                    "last_page": {
-                        "type": "integer"
-                    },
-                    "page": {
-                        "type": "integer"
-                    },
-                    "previous_page": {
-                        "type": "integer"
-                    },
-                    "next_page": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "Todo": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "readOnly": true
-                    },
-                    "text": {
-                        "type": "string",
-                        "maxLength": 255
-                    }
-                }
-            },
-            "User": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "readOnly": true
-                    },
-                    "email": {
-                        "type": "string",
-                        "maxLength": 255
-                    },
-                    "password": {
-                        "type": "string",
-                        "maxLength": 255
-                    },
-                    "name": {
-                        "type": "string",
-                        "maxLength": 255
-                    }
-                }
-            }
-        },
-        "responses": {
-            "DEFAULT_ERROR": {
-                "description": "Default error response",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/Error"
-                        }
-                    }
-                }
-            },
-            "UNPROCESSABLE_ENTITY": {
-                "description": "Unprocessable Entity",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/Error"
-                        }
-                    }
-                }
-            }
-        }
-    }
+    "openapi": "3.0.0"
 }
