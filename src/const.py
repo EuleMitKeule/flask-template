@@ -18,3 +18,5 @@ DEFAULT_SECRET_KEY = "changeme"
 
 SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 REDOC_URL = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
+
+ALLOWED_ORIGINS = []

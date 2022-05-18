@@ -20,7 +20,7 @@ def create_app(config_path: str) -> Flask:
     db.init_app(app)
     ma.init_app(app)
     api.init_app(app)
-    sio.init_app(app, cors_allowed_origins="*") # TODO fix CORS policy
+    sio.init_app(app)
     scheduler.init_app(app)
 
     import events
@@ -44,7 +44,7 @@ def create_app(config_path: str) -> Flask:
         admin_user: User = User.where(roles="admin").first()
 
         if not admin_user:
-            admin_user = User.create(
+            User.create(
                 name=config.config_model.auth.admin_username,
                 password=config.config_model.auth.admin_password,
                 roles="admin"

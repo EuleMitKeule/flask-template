@@ -10,20 +10,6 @@ class BaseModel(db.Model, AllFeaturesMixin):
 
     id: int = db.Column(db.Integer, primary_key=True)
 
-    @classmethod
-    def load(cls, data: dict, **kwargs) -> Optional[BaseModel]:
-        if not hasattr(cls, "Schema"):
-            return None
-
-        return cls.Schema().load(data, **kwargs)
-
-    @classmethod
-    def dump(cls, data: dict, **kwargs) -> dict:
-        if not hasattr(cls, "Schema"):
-            return None
-
-        return cls.Schema().dump(data, **kwargs)
-
     def update(self, data: dict = None, **kwargs) -> Optional[BaseModel]:
         if data is not None:
             if "id" not in data:
@@ -33,3 +19,38 @@ class BaseModel(db.Model, AllFeaturesMixin):
             return entity
 
         return super().update(**kwargs)
+
+    @classmethod
+    def load(cls, data: dict, **kwargs) -> Optional[BaseModel]:
+        if not hasattr(cls, "Schema"):
+            return None
+
+        return cls.Schema().load(data, **kwargs)
+
+    @classmethod
+    def dump(cls, data: dict, **kwargs) -> Optional[dict]:
+        if not hasattr(cls, "Schema"):
+            return None
+
+        return cls.Schema().dump(data, **kwargs)
+
+    @classmethod
+    @property
+    def single_name(cls) -> str:
+        return cls.__name__
+
+    @classmethod
+    @property
+    def single_lower_name(cls) -> str:
+        return cls.single_name.lower()
+
+    @classmethod
+    @property
+    def plural_name(cls) -> str:
+        return f"{cls.single_name}s"
+
+    @classmethod
+    @property
+    def lower_plural_name(cls) -> str:
+        return f"{cls.single_lower_name}s"
+    

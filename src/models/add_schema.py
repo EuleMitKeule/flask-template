@@ -4,11 +4,7 @@ from common import db, ma
 def add_schema(**kwargs):
     
     def decorator(cls):
-        single_model_name: str = cls.__name__
-        plural_model_name: str = f"{single_model_name}s"
-        lower_single_model_name: str = cls.__name__.lower()
-        lower_plural_model_name: str = f"{lower_single_model_name}s"
-        schema_name: str = f"{single_model_name}Schema"
+        schema_name: str = f"{cls.single_name}Schema"
 
         class Meta:
             model = cls

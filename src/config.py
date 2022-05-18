@@ -48,9 +48,6 @@ class Config:
     config_model: ConfigModel
     app: Flask
 
-    def __init__(self) -> None:
-        pass
-
     def load(self, config_path: str) -> None:
 
         if not os.path.exists(config_path):

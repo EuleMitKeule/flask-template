@@ -1,5 +1,5 @@
 from flask_socketio import join_room, leave_room
-from common import *
+from common import sio
 
 
 @sio.on("join")
