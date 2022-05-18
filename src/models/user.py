@@ -1,7 +1,7 @@
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from models import BaseModel, add_schema, add_view, OperationType
-from common import db, guard, ma
+from src.models import BaseModel, add_schema, add_view, OperationType
+from src.common import db, guard, ma
 
 
 @add_view(

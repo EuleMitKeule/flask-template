@@ -6,7 +6,7 @@ from flask_apscheduler import APScheduler
 from flask_smorest import Api
 from flask_praetorian import Praetorian
 
-from config import Config
+from src.config import Config
 
 
 config: Config = Config()

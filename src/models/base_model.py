@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Optional
-
-from common import db
 from sqlalchemy_mixins import AllFeaturesMixin
+
+from src.common import db
 
 
 class BaseModel(db.Model, AllFeaturesMixin):

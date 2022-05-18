@@ -3,9 +3,9 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy_mixins.activerecord import ModelNotFoundError
 
-from models import BaseModel
-from common import api
-from auth import auth_required, roles_required
+from src.models import BaseModel
+from src.common import api
+from src.auth import auth_required, roles_required
 
 
 def add_view(**kwargs):

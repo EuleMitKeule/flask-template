@@ -1,4 +1,4 @@
-from common import sio
+from src.common import sio
 
 
 @sio.on("connect")

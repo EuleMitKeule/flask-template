@@ -80,5 +80,3 @@ SocketIO events should be implemented in `src/events`.
 
 * Add template tests
 * Add Github workflows
-* Implement Dockerfile
-* Add SonarQube scanning
