@@ -10,21 +10,17 @@ from auth import auth_required, roles_required
 
 def add_view(**kwargs):
     
-    def decorator(cls):
+    def decorator(cls: BaseModel):
 
         auth: dict = kwargs.pop("auth", {})
-        decorators: dict = kwargs.pop("decorators", {})
-        single_model_name: str = cls.__name__
-        plural_model_name: str = f"{single_model_name}s"
-        lower_single_model_name: str = cls.__name__.lower()
-        lower_plural_model_name: str = f"{lower_single_model_name}s"
+        decorators_dict: dict = kwargs.pop("decorators", {})
         
         blueprint: Blueprint = kwargs.get(
             "blueprint",
             Blueprint(
-                lower_plural_model_name,
-                lower_plural_model_name,
-                url_prefix=f"/{lower_plural_model_name}"
+                cls.lower_plural_name,
+                cls.lower_plural_name,
+                url_prefix=f"/{cls.lower_plural_name}"
             )
         )
 
@@ -36,10 +32,10 @@ def add_view(**kwargs):
                     entity: BaseModel = cls.find_or_fail(entity_id)
                     entity_dict: dict = cls.dump(entity)
                     return jsonify(entity_dict)
-                except ModelNotFoundError as e:
+                except ModelNotFoundError:
                     abort(
                         404,
-                        message=f"{single_model_name} with id {entity_id} does not exist."
+                        message=f"{cls.single_name} with id {entity_id} does not exist."
                     )
 
             @blueprint.response(200, cls.Schema())
@@ -55,10 +51,10 @@ def add_view(**kwargs):
                     entity: BaseModel = cls.find_or_fail(entity_id)
                     entity.delete()
                     return "", 204
-                except ModelNotFoundError as e:
+                except ModelNotFoundError:
                     abort(
                         404,
-                        message=f"{single_model_name} with id {entity_id} does not exist."
+                        message=f"{cls.single_name} with id {entity_id} does not exist."
                     )
 
         class PluralView(MethodView):
@@ -76,34 +72,40 @@ def add_view(**kwargs):
                 todo_dict: dict = cls.dump(entity)
                 return jsonify(todo_dict), 201
         
-        for operation_type, decorator_list in decorators.items():
-            method = getattr(SingleView if operation_type.value[0] == "SingleView" else PluralView, operation_type.value[1])
-
-            for decorator in decorator_list:
-                setattr(SingleView if operation_type.value[0] == "SingleView" else PluralView, operation_type.value[1], decorator(method))
+        for operation_type, decorators in decorators_dict.items():
+            view = locals()[operation_type.view_name]
+            apply_decorators(view, operation_type.method_name, decorators)
 
         for operation_type, auth_dict in auth.items():
-            view = SingleView if operation_type.value[0] == "SingleView" else PluralView
-            method_name = operation_type.value[1]
+            view = locals()[operation_type.view_name]
+            apply_auth_decorators(view, operation_type.method_name, auth_dict)
 
-            method = getattr(view, method_name)
-
-            is_auth_required: bool = auth_dict.get("auth_required", False)
-            roles: list[str] = auth_dict.get("roles", [])
-
-            if is_auth_required:
-                method = auth_required(method)
-                setattr(view, method_name, method)
-
-            if roles:
-                method = roles_required(*roles)(method)
-                setattr(view, method_name, method)
-
-        SingleView = blueprint.route("/<int:entity_id>")(SingleView)
-        PluralView = blueprint.route("/")(PluralView)
+        blueprint.route("/<int:entity_id>")(SingleView)
+        blueprint.route("/")(PluralView)
 
         api.register_blueprint(blueprint)
 
         return cls
 
     return decorator
+
+
+def apply_decorators(cls, method_name, decorators):
+    for decorator in decorators:
+        apply_decorator(cls, method_name, decorator)
+
+
+def apply_auth_decorators(cls, method_name, auth_dict):
+    is_auth_required: bool = auth_dict.get("auth_required", False)
+    roles: list[str] = auth_dict.get("roles", [])
+
+    if is_auth_required:
+        apply_decorator(cls, method_name, auth_required)
+
+    if roles:
+        apply_decorator(cls, method_name, roles_required(*roles))
+
+
+def apply_decorator(cls, method_name, decorator):
+    method = getattr(cls, method_name)
+    setattr(cls, method_name, decorator(method))

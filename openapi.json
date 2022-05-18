@@ -16,10 +16,6 @@
                         "type": "integer",
                         "description": "Error code"
                     },
-                    "message": {
-                        "type": "string",
-                        "description": "Error message"
-                    },
                     "status": {
                         "type": "string",
                         "description": "Error name"
@@ -27,6 +23,10 @@
                     "errors": {
                         "type": "object",
                         "description": "Errors"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Error message"
                     }
                 }
             },
@@ -59,11 +59,11 @@
             "User": {
                 "type": "object",
                 "properties": {
-                    "password": {
-                        "type": "string",
-                        "writeOnly": true
-                    },
                     "email": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "name": {
                         "type": "string",
                         "maxLength": 255
                     },
@@ -71,21 +71,21 @@
                         "type": "integer",
                         "readOnly": true
                     },
-                    "name": {
-                        "type": "string",
-                        "maxLength": 255
-                    },
                     "roles": {
                         "type": "string",
                         "readOnly": true,
                         "nullable": true
                     },
-                    "is_active": {
-                        "type": "boolean",
-                        "nullable": true
-                    },
                     "access_token": {
                         "type": "string",
+                        "nullable": true
+                    },
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
                         "nullable": true
                     }
                 }
@@ -262,7 +262,7 @@
                 "parameters": [
                     {
                         "in": "query",
-                        "name": "username",
+                        "name": "password",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -270,7 +270,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "password",
+                        "name": "username",
                         "required": true,
                         "schema": {
                             "type": "string"
