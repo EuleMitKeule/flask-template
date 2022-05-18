@@ -11,7 +11,7 @@ from config import Config
 
 config: Config = Config()
     
-cors: CORS = CORS(resources={r"/*":{"origins":"*"}})
+cors: CORS = CORS(resources={r"/*": {"origins": "*", "send_wildcard": "False"}})
 
 db: SQLAlchemy = SQLAlchemy(session_options={
     'expire_on_commit': False
