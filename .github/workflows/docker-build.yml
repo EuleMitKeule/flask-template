@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: eulemitkeule/flask-template
+  IMAGE_NAME: EuleMitKeule/flask-template
 
 jobs:
   docker-build:
